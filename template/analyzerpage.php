@@ -23,10 +23,7 @@ if (!defined('ABSPATH')) exit;
             <!-- ADD THIS HIDDEN FIELD -->
             <input type="hidden" id="seo-analyzer-nonce" value="<?php echo
             wp_create_nonce('seo_analyzer_nonce'); ?>" />
-            <div class="input-wrapper">
-    
 
-            
             <div class="input-wrapper">
                 <input 
                     type="url" 

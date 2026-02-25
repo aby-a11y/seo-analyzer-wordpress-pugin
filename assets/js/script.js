@@ -1,3 +1,18 @@
+  /* global jQuery, seoAnalyzer */
+(function($) {
+    'use strict';
+    
+    // Safety check
+    if (typeof $ === 'undefined') {
+        $ = window.jQuery;
+    }
+    
+    if (!$) {
+        console.error('SEO Analyzer: jQuery not found');
+        return;
+    }
+
+
 /**
  * SEO Analyzer JavaScript
  * Handles AJAX requests, data display, and collapsible sections
@@ -587,4 +602,5 @@
         });
     }
 
+});   
 })(jQuery);

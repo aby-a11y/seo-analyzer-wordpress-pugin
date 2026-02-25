@@ -43,37 +43,51 @@ class SEO_Analyzer {
         wp_send_json_success($report);
     }
     
-    private function call_api($url) {
-        $response = wp_remote_post($this->api_url, array(
-            'body' => json_encode(array('url' => $url)),
-            'headers' => array(
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ),
-            'timeout' => 60,
-            'sslverify' => true
-        ));
-        
-        if (is_wp_error($response)) {
-            return array('error' => 'Connection failed: ' . $response->get_error_message());
-        }
-        
-        $code = wp_remote_retrieve_response_code($response);
-        if ($code !== 200) {
-            $body = wp_remote_retrieve_body($response);
-            return array('error' => 'API error (code: ' . $code . '): ' . substr($body, 0, 200));
-        }
-        
-        $body = wp_remote_retrieve_body($response);
-        $data = json_decode($body, true);
-        
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return array('error' => 'Invalid JSON response: ' . json_last_error_msg());
-        }
-        
-        return $data;
+  private function call_api($url) {
+    // Debug logging
+    error_log('SEO Analyzer: Starting API call for URL: ' . $url);
+    error_log('SEO Analyzer: API Endpoint: ' . $this->api_url);
+    
+    $response = wp_remote_post($this->api_url, array(
+        'body' => json_encode(array('url' => $url)),
+        'headers' => array(
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ),
+        'timeout' => 180,  // 3 minutes
+        'sslverify' => false  // Temporary for debugging
+    ));
+    
+    if (is_wp_error($response)) {
+        $error_msg = $response->get_error_message();
+        error_log('SEO Analyzer API Error: ' . $error_msg);
+        return array('error' => 'Connection failed: ' . $error_msg);
     }
     
+    $code = wp_remote_retrieve_response_code($response);
+    $body = wp_remote_retrieve_body($response);
+    
+    error_log('SEO Analyzer API Response Code: ' . $code);
+    error_log('SEO Analyzer API Response (first 500 chars): ' . substr($body, 0, 500));
+    
+    if ($code !== 200) {
+        $error_msg = 'API error (code: ' . $code . '): ' . substr($body, 0, 200);
+        error_log('SEO Analyzer: ' . $error_msg);
+        return array('error' => $error_msg);
+    }
+    
+    $data = json_decode($body, true);
+    
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        $json_error = json_last_error_msg();
+        error_log('SEO Analyzer JSON Error: ' . $json_error);
+        return array('error' => 'Invalid JSON response: ' . $json_error);
+    }
+    
+    error_log('SEO Analyzer: API call successful!');
+    return $data;
+}
+
     private function save_report($report) {
         global $wpdb;
         $table = $wpdb->prefix . 'seo_reports';

@@ -1,31 +1,110 @@
-  /* global jQuery, seoAnalyzer */
-(function($) {
-    'use strict';
-    
-    // Safety check
-    if (typeof $ === 'undefined') {
-        $ = window.jQuery;
-    }
-    
-    if (!$) {
-        console.error('SEO Analyzer: jQuery not found');
-        return;
-    }
-
-
 /**
- * SEO Analyzer JavaScript
- * Handles AJAX requests, data display, and collapsible sections
+ * SEO Analyzer JavaScript - Bulletproof Version
  */
 
-(function($) {
-    'use strict';
+// Wait for window load to ensure all scripts loaded
+window.addEventListener('DOMContentLoaded', function() {
+    console.log('=== SEO Analyzer: DOM Content Loaded ===');
+    
+    // Get jQuery reference safely
+    var $ = window.jQuery || window.$ || null;
+    
+    if (!$) {
+        console.error('SEO Analyzer: jQuery not found! Retrying...');
+        
+        // Retry after 500ms
+        setTimeout(function() {
+            $ = window.jQuery || window.$;
+            if ($) {
+                console.log('SEO Analyzer: jQuery found on retry!');
+                initSEOAnalyzer($);
+            } else {
+                console.error('SEO Analyzer: jQuery still not found. Plugin cannot work.');
+                alert('Error: jQuery library not loaded. Please contact support.');
+            }
+        }, 500);
+        return;
+    }
+    
+    console.log('SEO Analyzer: jQuery found!', 'Version:', $.fn.jquery);
+    initSEOAnalyzer($);
+});
 
-    // Initialize on document ready
+function initSEOAnalyzer($) {
+    'use strict';
+    
+    console.log('=== SEO Analyzer: Initializing ===');
+    
+    // Check configuration
+    if (typeof seoAnalyzer === 'undefined') {
+        console.error('SEO Analyzer: Configuration missing!');
+        window.seoAnalyzer = {
+            ajaxurl: '/wp-admin/admin-ajax.php',
+            nonce: $('#seo-analyzer-nonce').val() || ''
+        };
+        console.log('SEO Analyzer: Created fallback config');
+    }
+    
+    console.log('Config:', seoAnalyzer);
+    
+    // Initialize when DOM ready
     $(document).ready(function() {
+        console.log('SEO Analyzer: jQuery DOM Ready');
+        
+        // Check if elements exist
+        var button = $('#analyze-btn');
+        var input = $('#analyze-url');
+        
+        console.log('Button found:', button.length > 0);
+        console.log('Input found:', input.length > 0);
+        
+        if (button.length === 0) {
+            console.error('SEO Analyzer: Button not found!');
+            return;
+        }
+        
         initializeAnalyzer();
         setupCollapsibleSections();
+        
+        console.log('=== SEO Analyzer: Initialization Complete ===');
     });
+
+    /**
+     * Initialize analyzer functionality
+     */
+    function initializeAnalyzer() {
+        console.log('Attaching click handler...');
+        
+        $('#analyze-btn').off('click').on('click', function(e) {
+            e.preventDefault();
+            console.log('=== Analyze Button Clicked ===');
+            
+            const url = $('#analyze-url').val().trim();
+            console.log('URL:', url);
+            
+            if (!url) {
+                showError('Please enter a URL');
+                return;
+            }
+            
+            if (!isValidURL(url)) {
+                showError('Please enter a valid URL (e.g., https://example.com)');
+                return;
+            }
+            
+            analyzeURL(url);
+        });
+
+        $('#analyze-url').off('keypress').on('keypress', function(e) {
+            if (e.which === 13) {
+                console.log('Enter key pressed');
+                $('#analyze-btn').trigger('click');
+            }
+        });
+        
+        console.log('Event handlers attached successfully');
+    }
+
 
     /**
      * Initialize analyzer functionality

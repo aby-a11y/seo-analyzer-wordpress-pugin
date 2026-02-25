@@ -259,6 +259,7 @@ if (!defined('ABSPATH')) exit;
 
     </div> <!-- End results-container -->
 </div> <!-- End seo-analyzer-wrap -->
+
 <!-- Fallback jQuery Check -->
 <script>
 console.log('=== SEO Analyzer Template Loaded ===');

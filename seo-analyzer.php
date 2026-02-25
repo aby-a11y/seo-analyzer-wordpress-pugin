@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SEO Analyzer
  * Description: AI-powered SEO analysis tool for WordPress
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Abhishek Kumar
  */
 
@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) exit;
 
 define('SEO_ANALYZER_DIR', plugin_dir_path(__FILE__));
 define('SEO_ANALYZER_URL', plugin_dir_url(__FILE__));
-define('SEO_ANALYZER_VERSION', '1.0.3');
+define('SEO_ANALYZER_VERSION', '1.0.4');
 
 class SEO_Analyzer_Plugin {
     
@@ -27,11 +27,9 @@ class SEO_Analyzer_Plugin {
         register_activation_hook(__FILE__, array($this, 'activate'));
         add_action('admin_menu', array($this, 'add_admin_menu'));
         
-        // Admin assets
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_assets'), 999);
-        
-        // Frontend assets (for shortcode pages)
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
+        // CRITICAL: Load assets with highest priority
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_assets'), 1);
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'), 1);
         
         $this->load_dependencies();
     }
@@ -83,12 +81,19 @@ class SEO_Analyzer_Plugin {
             return;
         }
         
-        $this->remove_conflicting_scripts();
+        // Remove ALL conflicting scripts first
+        $this->remove_all_conflicts();
         
+        // Force load fresh jQuery
         wp_deregister_script('jquery');
-        wp_register_script('jquery', includes_url('/js/jquery/jquery.min.js'), array(), '3.7.1', false);
-        wp_enqueue_script('jquery');
+        wp_deregister_script('jquery-core');
+        wp_deregister_script('jquery-migrate');
         
+        wp_enqueue_script('jquery-core', includes_url('/js/jquery/jquery.min.js'), array(), '3.7.1', false);
+        wp_enqueue_script('jquery-migrate', includes_url('/js/jquery/jquery-migrate.min.js'), array('jquery-core'), '3.4.1', false);
+        wp_enqueue_script('jquery', false, array('jquery-core', 'jquery-migrate'), '3.7.1', false);
+        
+        // Our assets
         wp_enqueue_style('seo-analyzer-css', SEO_ANALYZER_URL . 'assets/css/style.css', array(), SEO_ANALYZER_VERSION);
         wp_enqueue_script('seo-analyzer-js', SEO_ANALYZER_URL . 'assets/js/script.js', array('jquery'), SEO_ANALYZER_VERSION, true);
         
@@ -98,49 +103,38 @@ class SEO_Analyzer_Plugin {
         ));
     }
     
-    // FRONTEND ASSETS (NEW)
+    // FRONTEND ASSETS
     public function enqueue_frontend_assets() {
         global $post;
         
-        // Only load if shortcode exists on current page
         if (!is_a($post, 'WP_Post') || !has_shortcode($post->post_content, 'seo_analyzer')) {
             return;
         }
         
-        // Remove potential conflicts
-        wp_dequeue_script('jquery-migrate');
-        wp_dequeue_script('lightslider');
+        // Remove conflicts
+        $this->remove_all_conflicts();
         
-        // Ensure jQuery
-        wp_enqueue_script('jquery');
+        // Ensure jQuery loaded properly
+        if (!wp_script_is('jquery', 'enqueued')) {
+            wp_enqueue_script('jquery');
+        }
         
         // Our assets
-        wp_enqueue_style(
-            'seo-analyzer-frontend-css', 
-            SEO_ANALYZER_URL . 'assets/css/style.css', 
-            array(), 
-            SEO_ANALYZER_VERSION
-        );
+        wp_enqueue_style('seo-analyzer-frontend-css', SEO_ANALYZER_URL . 'assets/css/style.css', array(), SEO_ANALYZER_VERSION);
+        wp_enqueue_script('seo-analyzer-frontend-js', SEO_ANALYZER_URL . 'assets/js/script.js', array('jquery'), SEO_ANALYZER_VERSION, true);
         
-        wp_enqueue_script(
-            'seo-analyzer-frontend-js', 
-            SEO_ANALYZER_URL . 'assets/js/script.js', 
-            array('jquery'), 
-            SEO_ANALYZER_VERSION, 
-            true
-        );
-        
-        // Localize for AJAX
         wp_localize_script('seo-analyzer-frontend-js', 'seoAnalyzer', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('seo_analyzer_nonce')
         ));
     }
     
-    private function remove_conflicting_scripts() {
+    private function remove_all_conflicts() {
+        // Remove conflicting scripts
         $conflicts = array(
             'gform_gravityforms', 'gform_placeholder', 'gform_conditional_logic', 
-            'gform_json', 'gform_tooltip', 'jquery-migrate', 'jquery-ui-core', 'lightslider'
+            'gform_json', 'gform_tooltip', 'lightslider', 'jquery-ui-core',
+            'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-datepicker'
         );
         
         foreach ($conflicts as $handle) {
@@ -148,8 +142,9 @@ class SEO_Analyzer_Plugin {
             wp_deregister_script($handle);
         }
         
-        $gf_styles = array('gform_admin', 'gform_tooltip', 'gform_reset');
-        foreach ($gf_styles as $handle) {
+        // Remove conflicting styles
+        $style_conflicts = array('gform_admin', 'gform_tooltip', 'gform_reset', 'lightslider');
+        foreach ($style_conflicts as $handle) {
             wp_dequeue_style($handle);
             wp_deregister_style($handle);
         }

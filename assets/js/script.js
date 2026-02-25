@@ -69,42 +69,7 @@ function initSEOAnalyzer($) {
         console.log('=== SEO Analyzer: Initialization Complete ===');
     });
 
-    /**
-     * Initialize analyzer functionality
-     */
-    function initializeAnalyzer() {
-        console.log('Attaching click handler...');
-        
-        $('#analyze-btn').off('click').on('click', function(e) {
-            e.preventDefault();
-            console.log('=== Analyze Button Clicked ===');
-            
-            const url = $('#analyze-url').val().trim();
-            console.log('URL:', url);
-            
-            if (!url) {
-                showError('Please enter a URL');
-                return;
-            }
-            
-            if (!isValidURL(url)) {
-                showError('Please enter a valid URL (e.g., https://example.com)');
-                return;
-            }
-            
-            analyzeURL(url);
-        });
-
-        $('#analyze-url').off('keypress').on('keypress', function(e) {
-            if (e.which === 13) {
-                console.log('Enter key pressed');
-                $('#analyze-btn').trigger('click');
-            }
-        });
-        
-        console.log('Event handlers attached successfully');
-    }
-
+ 
 
     /**
      * Initialize analyzer functionality
@@ -680,7 +645,5 @@ function initSEOAnalyzer($) {
             }
         });
     }
-    
-
  
-}(jQuery);
+} 

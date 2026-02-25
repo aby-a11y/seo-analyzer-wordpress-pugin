@@ -259,3 +259,26 @@ if (!defined('ABSPATH')) exit;
 
     </div> <!-- End results-container -->
 </div> <!-- End seo-analyzer-wrap -->
+<!-- Fallback jQuery Check -->
+<script>
+console.log('=== SEO Analyzer Template Loaded ===');
+console.log('jQuery available:', typeof jQuery !== 'undefined');
+console.log('$ available:', typeof $ !== 'undefined');
+console.log('seoAnalyzer config:', typeof seoAnalyzer !== 'undefined' ? seoAnalyzer : 'NOT LOADED');
+
+if (typeof jQuery === 'undefined') {
+    console.error('CRITICAL: jQuery not loaded when template rendered!');
+} else {
+    console.log('jQuery version:', jQuery.fn.jquery);
+}
+
+// Check if button exists
+if (typeof jQuery !== 'undefined') {
+    jQuery(document).ready(function($) {
+        console.log('Button exists:', $('#analyze-btn').length);
+        console.log('Input exists:', $('#analyze-url').length);
+    });
+}
+</script>
+
+

@@ -1,90 +1,169 @@
 <?php
 /**
- * Plugin Name: AI SEO Analyzer
- * Description: Free AI-powered SEO analysis tool
- * Version: 1.0.0
- * Author: Abhishek
+ * Plugin Name: SEO Analyzer
+ * Description: AI-powered SEO analysis tool for WordPress
+ * Version: 1.0.3
+ * Author: Abhishek Kumar
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('SEO_ANALYZER_VERSION', '1.0.0');
 define('SEO_ANALYZER_DIR', plugin_dir_path(__FILE__));
 define('SEO_ANALYZER_URL', plugin_dir_url(__FILE__));
+define('SEO_ANALYZER_VERSION', '1.0.3');
 
-require_once SEO_ANALYZER_DIR . 'includes/class-seo-analyzer.php';
+class SEO_Analyzer_Plugin {
+    
+    private static $instance = null;
+    
+    public static function get_instance() {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    
+    private function __construct() {
+        register_activation_hook(__FILE__, array($this, 'activate'));
+        add_action('admin_menu', array($this, 'add_admin_menu'));
+        
+        // Admin assets
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_assets'), 999);
+        
+        // Frontend assets (for shortcode pages)
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
+        
+        $this->load_dependencies();
+    }
+    
+    private function load_dependencies() {
+        require_once SEO_ANALYZER_DIR . 'includes/class-seo-analyzer.php';
+        $analyzer = new SEO_Analyzer();
+        $analyzer->init();
+    }
+    
+    public function activate() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'seo_reports';
+        $charset_collate = $wpdb->get_charset_collate();
+        
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            report_id varchar(100) NOT NULL,
+            url varchar(500) NOT NULL,
+            seo_score float DEFAULT 0,
+            title text,
+            meta_description text,
+            report_data longtext,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY report_id (report_id)
+        ) $charset_collate;";
+        
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+        flush_rewrite_rules();
+    }
+    
+    public function add_admin_menu() {
+        add_menu_page(
+            'SEO Analyzer',
+            'SEO Analyzer',
+            'manage_options',
+            'seo-analyzer',
+            array($this, 'render_page'),
+            'dashicons-search',
+            30
+        );
+    }
+    
+    // ADMIN ASSETS
+    public function enqueue_assets($hook) {
+        if ($hook !== 'toplevel_page_seo-analyzer') {
+            return;
+        }
+        
+        $this->remove_conflicting_scripts();
+        
+        wp_deregister_script('jquery');
+        wp_register_script('jquery', includes_url('/js/jquery/jquery.min.js'), array(), '3.7.1', false);
+        wp_enqueue_script('jquery');
+        
+        wp_enqueue_style('seo-analyzer-css', SEO_ANALYZER_URL . 'assets/css/style.css', array(), SEO_ANALYZER_VERSION);
+        wp_enqueue_script('seo-analyzer-js', SEO_ANALYZER_URL . 'assets/js/script.js', array('jquery'), SEO_ANALYZER_VERSION, true);
+        
+        wp_localize_script('seo-analyzer-js', 'seoAnalyzer', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('seo_analyzer_nonce')
+        ));
+    }
+    
+    // FRONTEND ASSETS (NEW)
+    public function enqueue_frontend_assets() {
+        global $post;
+        
+        // Only load if shortcode exists on current page
+        if (!is_a($post, 'WP_Post') || !has_shortcode($post->post_content, 'seo_analyzer')) {
+            return;
+        }
+        
+        // Remove potential conflicts
+        wp_dequeue_script('jquery-migrate');
+        wp_dequeue_script('lightslider');
+        
+        // Ensure jQuery
+        wp_enqueue_script('jquery');
+        
+        // Our assets
+        wp_enqueue_style(
+            'seo-analyzer-frontend-css', 
+            SEO_ANALYZER_URL . 'assets/css/style.css', 
+            array(), 
+            SEO_ANALYZER_VERSION
+        );
+        
+        wp_enqueue_script(
+            'seo-analyzer-frontend-js', 
+            SEO_ANALYZER_URL . 'assets/js/script.js', 
+            array('jquery'), 
+            SEO_ANALYZER_VERSION, 
+            true
+        );
+        
+        // Localize for AJAX
+        wp_localize_script('seo-analyzer-frontend-js', 'seoAnalyzer', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('seo_analyzer_nonce')
+        ));
+    }
+    
+    private function remove_conflicting_scripts() {
+        $conflicts = array(
+            'gform_gravityforms', 'gform_placeholder', 'gform_conditional_logic', 
+            'gform_json', 'gform_tooltip', 'jquery-migrate', 'jquery-ui-core', 'lightslider'
+        );
+        
+        foreach ($conflicts as $handle) {
+            wp_dequeue_script($handle);
+            wp_deregister_script($handle);
+        }
+        
+        $gf_styles = array('gform_admin', 'gform_tooltip', 'gform_reset');
+        foreach ($gf_styles as $handle) {
+            wp_dequeue_style($handle);
+            wp_deregister_style($handle);
+        }
+    }
+    
+    public function render_page() {
+        echo '<div class="wrap">';
+        $analyzer = new SEO_Analyzer();
+        echo $analyzer->render_frontend(array());
+        echo '</div>';
+    }
+}
 
 function seo_analyzer_init() {
-    $analyzer = new SEO_Analyzer();
-    $analyzer->init();
+    return SEO_Analyzer_Plugin::get_instance();
 }
 add_action('plugins_loaded', 'seo_analyzer_init');
-
-// Database creation
-register_activation_hook(__FILE__, 'seo_analyzer_activate');
-function seo_analyzer_activate() {
-    global $wpdb;
-    $table = $wpdb->prefix . 'seo_reports';
-    
-    $sql = "CREATE TABLE IF NOT EXISTS $table (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        report_id varchar(100) NOT NULL,
-        url varchar(500) NOT NULL,
-        seo_score float,
-        title text,
-        meta_description text,
-        report_data longtext,
-        created_at datetime DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        UNIQUE KEY report_id (report_id)
-    ) {$wpdb->get_charset_collate()};";
-    
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-}
-
-// Admin menu
-add_action('admin_menu', 'seo_analyzer_menu');
-function seo_analyzer_menu() {
-    add_menu_page(
-        'SEO Analyzer',
-        'SEO Analyzer',
-        'manage_options',
-        'seo-analyzer',
-        'seo_analyzer_page',
-        'dashicons-search',
-        30
-    );
-}
-
-// 🔥 IMPORTANT: "template" not "templates"
-function seo_analyzer_page() {
-    include SEO_ANALYZER_DIR . 'template/analyzerpage.php';
-}
-
-// Assets
-add_action('admin_enqueue_scripts', 'seo_analyzer_assets');
-function seo_analyzer_assets($hook) {
-    if ($hook !== 'toplevel_page_seo-analyzer') return;
-    
-    wp_enqueue_style(
-        'seo-analyzer-css',
-        SEO_ANALYZER_URL . 'assets/css/style.css',
-        array(),
-        SEO_ANALYZER_VERSION
-    );
-    
-    wp_enqueue_script(
-        'seo-analyzer-js',
-        SEO_ANALYZER_URL . 'assets/js/script.js',
-        array('jquery'),
-        SEO_ANALYZER_VERSION,
-        true
-    );
-    
-    wp_localize_script('seo-analyzer-js', 'seoAnalyzer', array(
-        'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('seo_analyzer_nonce')
-    ));
-}
-?>

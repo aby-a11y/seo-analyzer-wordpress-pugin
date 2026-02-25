@@ -1,3 +1,39 @@
+/* === FRONTEND THEME OVERRIDE === */
+body .seo-analyzer-wrap,
+.page .seo-analyzer-wrap,
+.post .seo-analyzer-wrap,
+article .seo-analyzer-wrap,
+main .seo-analyzer-wrap {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    max-width: 1200px !important;
+    margin: 20px auto !important;
+    padding: 20px !important;
+    background: #f8fafc !important;
+}
+
+.seo-analyzer-wrap .analyzer-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    padding: 40px 20px !important;
+    border-radius: 16px !important;
+    color: white !important;
+    text-align: center !important;
+}
+
+.seo-analyzer-wrap .analyzer-header h1 {
+    color: white !important;
+    font-size: 2.5em !important;
+    margin: 0 0 10px 0 !important;
+}
+
+.seo-analyzer-wrap .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* === END FRONTEND OVERRIDE === */
+
+
 /**
  * SEO Analyzer Styles
  * Modern, responsive design with collapsible sections

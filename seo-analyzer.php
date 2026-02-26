@@ -94,7 +94,9 @@ class SEO_Analyzer_Plugin {
         wp_enqueue_script('jquery', false, array('jquery-core', 'jquery-migrate'), '3.7.1', false);
         
         // Our assets
-     // Enqueue CSS
+    }
+}
+        // Enqueue CSS
 wp_enqueue_style('seo-analyzer-css', SEO_ANALYZER_URL . 'assets/css/style.css', array(), SEO_ANALYZER_VERSION);
 
 // Enqueue JS
@@ -190,3 +192,4 @@ function seo_analyzer_init() {
     return SEO_Analyzer_Plugin::get_instance();
 }
 add_action('plugins_loaded', 'seo_analyzer_init');
+   

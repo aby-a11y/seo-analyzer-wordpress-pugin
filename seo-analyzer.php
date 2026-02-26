@@ -93,32 +93,30 @@ class SEO_Analyzer_Plugin {
         wp_enqueue_script('jquery-migrate', includes_url('/js/jquery/jquery-migrate.min.js'), array('jquery-core'), '3.4.1', false);
         wp_enqueue_script('jquery', false, array('jquery-core', 'jquery-migrate'), '3.7.1', false);
         
-        // Our assets
-    }
-}
         // Enqueue CSS
-wp_enqueue_style('seo-analyzer-css', SEO_ANALYZER_URL . 'assets/css/style.css', array(), SEO_ANALYZER_VERSION);
-
-// Enqueue JS
-wp_enqueue_script('seo-analyzer-js', SEO_ANALYZER_URL . 'assets/js/script.js', array('jquery'), SEO_ANALYZER_VERSION, true);
-
-// CRITICAL: Pass config BEFORE script loads
-wp_localize_script('seo-analyzer-js', 'seoAnalyzer', array(
-    'ajaxurl' => admin_url('admin-ajax.php'),
-    'nonce' => wp_create_nonce('seo_analyzer_nonce')
-));
-
-// Also add inline config as backup
-wp_add_inline_script('seo-analyzer-js', '
-    if (typeof seoAnalyzer === "undefined") {
-        window.seoAnalyzer = {
-            ajaxurl: "' . admin_url('admin-ajax.php') . '",
-            nonce: "' . wp_create_nonce('seo_analyzer_nonce') . '"
-        };
-        console.log("SEO Analyzer: Inline config injected");
+        wp_enqueue_style('seo-analyzer-css', SEO_ANALYZER_URL . 'assets/css/style.css', array(), SEO_ANALYZER_VERSION);
+        
+        // Enqueue JS
+        wp_enqueue_script('seo-analyzer-js', SEO_ANALYZER_URL . 'assets/js/script.js', array('jquery'), SEO_ANALYZER_VERSION, true);
+        
+        // CRITICAL: Pass config BEFORE script loads
+        wp_localize_script('seo-analyzer-js', 'seoAnalyzer', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('seo_analyzer_nonce')
+        ));
+        
+        // Also add inline config as backup
+        wp_add_inline_script('seo-analyzer-js', '
+            if (typeof seoAnalyzer === "undefined") {
+                window.seoAnalyzer = {
+                    ajaxurl: "' . admin_url('admin-ajax.php') . '",
+                    nonce: "' . wp_create_nonce('seo_analyzer_nonce') . '"
+                };
+                console.log("SEO Analyzer: Inline config injected");
+            }
+        ', 'before');
     }
-', 'before');
-
+    
     // FRONTEND ASSETS
     public function enqueue_frontend_assets() {
         global $post;
@@ -135,29 +133,29 @@ wp_add_inline_script('seo-analyzer-js', '
             wp_enqueue_script('jquery');
         }
         
-// Enqueue CSS
-wp_enqueue_style('seo-analyzer-frontend-css', SEO_ANALYZER_URL . 'assets/css/style.css', array(), SEO_ANALYZER_VERSION);
-
-// Enqueue JS
-wp_enqueue_script('seo-analyzer-frontend-js', SEO_ANALYZER_URL . 'assets/js/script.js', array('jquery'), SEO_ANALYZER_VERSION, true);
-
-// Pass config
-wp_localize_script('seo-analyzer-frontend-js', 'seoAnalyzer', array(
-    'ajaxurl' => admin_url('admin-ajax.php'),
-    'nonce' => wp_create_nonce('seo_analyzer_nonce')
-));
-
-// Inline backup config
-wp_add_inline_script('seo-analyzer-frontend-js', '
-    if (typeof seoAnalyzer === "undefined") {
-        window.seoAnalyzer = {
-            ajaxurl: "' . admin_url('admin-ajax.php') . '",
-            nonce: "' . wp_create_nonce('seo_analyzer_nonce') . '"
-        };
-        console.log("SEO Analyzer: Inline config injected (frontend)");
+        // Enqueue CSS
+        wp_enqueue_style('seo-analyzer-frontend-css', SEO_ANALYZER_URL . 'assets/css/style.css', array(), SEO_ANALYZER_VERSION);
+        
+        // Enqueue JS
+        wp_enqueue_script('seo-analyzer-frontend-js', SEO_ANALYZER_URL . 'assets/js/script.js', array('jquery'), SEO_ANALYZER_VERSION, true);
+        
+        // Pass config
+        wp_localize_script('seo-analyzer-frontend-js', 'seoAnalyzer', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('seo_analyzer_nonce')
+        ));
+        
+        // Inline backup config
+        wp_add_inline_script('seo-analyzer-frontend-js', '
+            if (typeof seoAnalyzer === "undefined") {
+                window.seoAnalyzer = {
+                    ajaxurl: "' . admin_url('admin-ajax.php') . '",
+                    nonce: "' . wp_create_nonce('seo_analyzer_nonce') . '"
+                };
+                console.log("SEO Analyzer: Inline config injected (frontend)");
+            }
+        ', 'before');
     }
-', 'before');
-
     
     private function remove_all_conflicts() {
         // Remove conflicting scripts
@@ -192,4 +190,3 @@ function seo_analyzer_init() {
     return SEO_Analyzer_Plugin::get_instance();
 }
 add_action('plugins_loaded', 'seo_analyzer_init');
-   

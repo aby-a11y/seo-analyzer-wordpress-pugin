@@ -1,18 +1,14 @@
 /**
- * SEO Analyzer JavaScript - Bulletproof Version
+ * SEO Analyzer JavaScript - Complete with All Features
  */
 
-// Wait for window load to ensure all scripts loaded
 window.addEventListener('DOMContentLoaded', function() {
     console.log('=== SEO Analyzer: DOM Content Loaded ===');
     
-    // Get jQuery reference safely
     var $ = window.jQuery || window.$ || null;
     
     if (!$) {
         console.error('SEO Analyzer: jQuery not found! Retrying...');
-        
-        // Retry after 500ms
         setTimeout(function() {
             $ = window.jQuery || window.$;
             if ($) {
@@ -35,7 +31,6 @@ function initSEOAnalyzer($) {
     
     console.log('=== SEO Analyzer: Initializing ===');
     
-    // Check configuration
     if (typeof seoAnalyzer === 'undefined') {
         console.error('SEO Analyzer: Configuration missing!');
         window.seoAnalyzer = {
@@ -47,11 +42,9 @@ function initSEOAnalyzer($) {
     
     console.log('Config:', seoAnalyzer);
     
-    // Initialize when DOM ready
     $(document).ready(function() {
         console.log('SEO Analyzer: jQuery DOM Ready');
         
-        // Check if elements exist
         var button = $('#analyze-btn');
         var input = $('#analyze-url');
         
@@ -69,11 +62,6 @@ function initSEOAnalyzer($) {
         console.log('=== SEO Analyzer: Initialization Complete ===');
     });
 
- 
-
-    /**
-     * Initialize analyzer functionality
-     */
     function initializeAnalyzer() {
         $('#analyze-btn').on('click', function(e) {
             e.preventDefault();
@@ -92,7 +80,6 @@ function initSEOAnalyzer($) {
             analyzeURL(url);
         });
 
-        // Enter key support
         $('#analyze-url').on('keypress', function(e) {
             if (e.which === 13) {
                 $('#analyze-btn').click();
@@ -100,9 +87,6 @@ function initSEOAnalyzer($) {
         });
     }
 
-    /**
-     * Validate URL format
-     */
     function isValidURL(string) {
         try {
             const url = new URL(string);
@@ -112,9 +96,6 @@ function initSEOAnalyzer($) {
         }
     }
 
-    /**
-     * Show error message
-     */
     function showError(message) {
         $('#error-message').html('<strong>Error:</strong> ' + message).fadeIn();
         setTimeout(function() {
@@ -122,11 +103,7 @@ function initSEOAnalyzer($) {
         }, 5000);
     }
 
-    /**
-     * Main analyze function - AJAX request
-     */
     function analyzeURL(url) {
-        // Show loading state
         $('#analyze-btn').prop('disabled', true);
         $('.btn-text').hide();
         $('.btn-loader').show();
@@ -141,7 +118,7 @@ function initSEOAnalyzer($) {
                 url: url,
                 nonce: seoAnalyzer.nonce
             },
-            timeout: 120000, // 2 minutes timeout
+            timeout: 120000,
             success: function(response) {
                 if (response.success) {
                     displayResults(response.data);
@@ -159,28 +136,26 @@ function initSEOAnalyzer($) {
                 showError(errorMsg);
             },
             complete: function() {
-                // Reset button state
                 $('#analyze-btn').prop('disabled', false);
                 $('.btn-text').show();
                 $('.btn-loader').hide();
             }
         });
     }
+
     /**
-     * Display all results
+     * MAIN DISPLAY FUNCTION - Calls all sub-functions
      */
     function displayResults(data) {
-        console.log('Analysis Data:', data); // Debug
+        console.log('=== Full Analysis Data ===', data);
         
-        // Show results container
         $('#results-container').fadeIn();
         
-        // Scroll to results
         $('html, body').animate({
             scrollTop: $('#results-container').offset().top - 50
         }, 500);
 
-        // Display each section
+        // Call ALL display functions
         displayScoreAndSummary(data);
         displayQuickStats(data);
         displaySEOIssues(data);
@@ -190,22 +165,19 @@ function initSEOAnalyzer($) {
         displayKeywordAnalysis(data);
         displayPageSpeed(data);
         displayLinkingAnalysis(data);
+        displayBacklinkAnalysis(data);
         displayKeywordStrategy(data);
+        displayContentRecommendations(data);
         displayActionPlan(data);
     }
 
-    /**
-     * Display SEO score and summary
-     */
     function displayScoreAndSummary(data) {
         const score = data.seo_score || 0;
         
-        // Update score number
         $('#seo-score').text(score);
         $('#analyzed-url').text(data.url || 'N/A');
         $('#analysis-summary').text(data.analysis_summary || 'Analysis completed successfully.');
         
-        // Animate score circle
         const circumference = 2 * Math.PI * 90;
         const offset = circumference - (score / 100) * circumference;
         
@@ -218,17 +190,13 @@ function initSEOAnalyzer($) {
             $('#score-circle').css('stroke-dashoffset', offset);
         }, 100);
         
-        // Set color based on score
-        let color = '#ef4444'; // Red
-        if (score >= 80) color = '#22c55e'; // Green
-        else if (score >= 60) color = '#f59e0b'; // Orange
+        let color = '#ef4444';
+        if (score >= 80) color = '#22c55e';
+        else if (score >= 60) color = '#f59e0b';
         
         $('#score-circle').css('stroke', color);
     }
 
-    /**
-     * Display quick stats cards
-     */
     function displayQuickStats(data) {
         $('#word-count').text(data.word_count || 0);
         $('#image-count').text(data.total_images || 0);
@@ -241,9 +209,6 @@ function initSEOAnalyzer($) {
         $('#load-time').text(loadTime.toFixed(2) + 's');
     }
 
-    /**
-     * Display SEO Issues section
-     */
     function displaySEOIssues(data) {
         const issues = data.seo_issues || [];
         $('#issues-count').text(issues.length);
@@ -275,9 +240,6 @@ function initSEOAnalyzer($) {
         $('#issues-list').html(html);
     }
 
-    /**
-     * Get priority icon
-     */
     function getPriorityIcon(priority) {
         const icons = {
             'High': '🔴',
@@ -287,20 +249,14 @@ function initSEOAnalyzer($) {
         return icons[priority] || '⚪';
     }
 
-    /**
-     * Format recommendation text with line breaks
-     */
     function formatRecommendation(text) {
         if (!text) return '';
-        return text.replace(/\n/g, '<br>').replace(/\\n/g, '<br>');
+        return text.replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
     }
-    /**
-     * Display Technical SEO section
-     */
+
     function displayTechnicalSEO(data) {
         const technical = data.technical_seo || {};
         
-        // Canonical status
         let canonicalHTML = `
             <div class="status-item ${technical.canonical_status?.includes('✅') ? 'status-good' : 'status-warning'}">
                 <strong>Status:</strong> ${technical.canonical_status || 'Not checked'}
@@ -318,7 +274,6 @@ function initSEOAnalyzer($) {
         }
         $('#canonical-status').html(canonicalHTML);
         
-        // Robots status
         let robotsHTML = `
             <div class="status-item ${technical.robots_txt_found ? 'status-good' : 'status-error'}">
                 <strong>Robots.txt:</strong> ${technical.robots_txt_found ? '✅ Found' : '❌ Missing'}
@@ -332,7 +287,6 @@ function initSEOAnalyzer($) {
         }
         $('#robots-status').html(robotsHTML);
         
-        // SSL status
         const sslHTML = `
             <div class="status-item ${technical.ssl_enabled ? 'status-good' : 'status-error'}">
                 <strong>HTTPS:</strong> ${technical.ssl_enabled ? '✅ Enabled' : '❌ Disabled (Critical!)'}
@@ -340,7 +294,6 @@ function initSEOAnalyzer($) {
         `;
         $('#ssl-status').html(sslHTML);
         
-        // Schema status
         const schema = data.schema_analysis || {};
         let schemaHTML = `
             <div class="status-item ${schema.has_schema ? 'status-good' : 'status-warning'}">
@@ -349,15 +302,12 @@ function initSEOAnalyzer($) {
         `;
         if (schema.schema_types && schema.schema_types.length > 0) {
             schemaHTML += `<div class="status-item"><strong>Types:</strong> ${schema.schema_types.join(', ')}</div>`;
+            schemaHTML += `<div class="status-item"><strong>Count:</strong> ${schema.schema_count || 0} items</div>`;
         }
         $('#schema-status').html(schemaHTML);
     }
 
-    /**
-     * Display On-Page SEO section
-     */
     function displayOnPageSEO(data) {
-        // Title tag
         const titleLength = (data.title || '').length;
         const titleStatus = titleLength >= 50 && titleLength <= 60 ? 'good' : 
                           (titleLength > 60 ? 'warning' : 'error');
@@ -369,7 +319,6 @@ function initSEOAnalyzer($) {
             </div>
         `);
         
-        // Meta description
         const metaLength = (data.meta_description || '').length;
         const metaStatus = metaLength >= 120 && metaLength <= 160 ? 'good' : 
                           (metaLength > 160 ? 'warning' : 'error');
@@ -381,7 +330,6 @@ function initSEOAnalyzer($) {
             </div>
         `);
         
-        // Headings structure
         let headingsHTML = '<div class="headings-list">';
         const headingCounts = {
             'H1': (data.h1_tags || []).length,
@@ -406,14 +354,17 @@ function initSEOAnalyzer($) {
         headingsHTML += '</div>';
         $('#headings-structure').html(headingsHTML);
     }
+
     /**
-     * Display Readability Analysis
+     * READABILITY ANALYSIS - Complete Display
      */
     function displayReadability(data) {
         const readability = data.readability_analysis || {};
         
-        if (!readability.flesch_reading_ease) {
-            $('#readability-content').html('<p>No readability data available</p>');
+        console.log('Readability Data:', readability);
+        
+        if (!readability.flesch_reading_ease && readability.flesch_reading_ease !== 0) {
+            $('#readability-content').html('<p class="no-data">❌ No readability data available from API</p>');
             return;
         }
         
@@ -422,66 +373,101 @@ function initSEOAnalyzer($) {
         
         const html = `
             <div class="readability-grid">
-                <div class="metric-card status-${scoreClass}">
+                <div class="metric-card main-metric status-${scoreClass}">
+                    <div class="metric-icon">📖</div>
                     <div class="metric-value">${score}</div>
                     <div class="metric-label">Flesch Reading Ease</div>
+                    <div class="metric-grade">${readability.readability_grade || 'N/A'}</div>
                 </div>
                 <div class="metric-card">
+                    <div class="metric-icon">🎓</div>
                     <div class="metric-value">${readability.flesch_kincaid_grade || 'N/A'}</div>
                     <div class="metric-label">Grade Level</div>
                 </div>
                 <div class="metric-card">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-value">${readability.gunning_fog || 'N/A'}</div>
+                    <div class="metric-label">Gunning Fog Index</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">⏱️</div>
                     <div class="metric-value">${readability.reading_time_minutes || 0} min</div>
                     <div class="metric-label">Reading Time</div>
                 </div>
             </div>
             <div class="readability-info">
-                <p><strong>Difficulty:</strong> ${readability.difficulty_level || 'N/A'}</p>
-                <p><strong>Grade:</strong> ${readability.readability_grade || 'N/A'}</p>
+                <p><strong>Difficulty Level:</strong> ${readability.difficulty_level || 'N/A'}</p>
+                <p><strong>Interpretation:</strong> ${getReadabilityInterpretation(score)}</p>
             </div>
         `;
         $('#readability-content').html(html);
     }
 
+    function getReadabilityInterpretation(score) {
+        if (score >= 80) return '✅ Excellent - Very easy to read';
+        if (score >= 70) return '✅ Good - Fairly easy to understand';
+        if (score >= 60) return '⚠️ Standard - Acceptable readability';
+        if (score >= 50) return '⚠️ Fairly Difficult - Consider simplifying';
+        return '❌ Very Difficult - Content may be too complex';
+    }
+
     /**
-     * Display Keyword Analysis
+     * KEYWORD DENSITY ANALYSIS - Complete Table
      */
     function displayKeywordAnalysis(data) {
         const keywords = data.keyword_density_analysis || {};
         
+        console.log('Keyword Data:', keywords);
+        
         if (!keywords.top_keywords || keywords.top_keywords.length === 0) {
-            $('#keyword-content').html('<p>No keyword data available</p>');
+            $('#keyword-content').html('<p class="no-data">❌ No keyword data available from API</p>');
             return;
         }
         
         let html = `
-            <div class="keyword-stats">
-                <div class="stat"><strong>Total Words:</strong> ${keywords.total_words || 0}</div>
-                <div class="stat"><strong>Unique Words:</strong> ${keywords.unique_words || 0}</div>
-                <div class="stat"><strong>Diversity:</strong> ${keywords.lexical_diversity_grade || 'N/A'}</div>
+            <div class="keyword-stats-grid">
+                <div class="stat-box">
+                    <div class="stat-number">${keywords.total_words || 0}</div>
+                    <div class="stat-label">Total Words</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${keywords.unique_words || 0}</div>
+                    <div class="stat-label">Unique Words</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${keywords.lexical_diversity || 0}</div>
+                    <div class="stat-label">Lexical Diversity</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${keywords.lexical_diversity_grade || 'N/A'}</div>
+                    <div class="stat-label">Diversity Grade</div>
+                </div>
             </div>
-            <h4>Top Keywords</h4>
+            
+            <h4>Top Keywords Found</h4>
             <table class="keyword-table">
                 <thead>
                     <tr>
                         <th>Keyword</th>
                         <th>Count</th>
-                        <th>Density</th>
+                        <th>Density %</th>
                         <th>In Title</th>
+                        <th>In Meta</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
         `;
         
-        keywords.top_keywords.slice(0, 10).forEach(kw => {
+        keywords.top_keywords.slice(0, 15).forEach(kw => {
             html += `
                 <tr>
                     <td><strong>${kw.keyword}</strong></td>
                     <td>${kw.count}</td>
                     <td>${kw.density_percent}%</td>
                     <td>${kw.in_title ? '✅' : '❌'}</td>
-                    <td>${kw.status}</td>
+                    <td>${kw.in_meta_description ? '✅' : '❌'}</td>
+                    <td><span class="keyword-status ${kw.status.includes('Good') || kw.status.includes('✅') ? 'good' : 'warning'}">${kw.status}</span></td>
                 </tr>
             `;
         });
@@ -489,24 +475,43 @@ function initSEOAnalyzer($) {
         html += '</tbody></table>';
         
         if (keywords.top_phrases && keywords.top_phrases.length > 0) {
-            html += '<h4>Top Phrases</h4><ul class="phrases-list">';
-            keywords.top_phrases.slice(0, 5).forEach(phrase => {
-                html += `<li><strong>${phrase.phrase}</strong> (${phrase.count} times)</li>`;
+            html += '<h4>Top 2-Word Phrases</h4><div class="phrases-grid">';
+            keywords.top_phrases.slice(0, 10).forEach(phrase => {
+                html += `
+                    <div class="phrase-item">
+                        <strong>"${phrase.phrase}"</strong>
+                        <span>${phrase.count} times (${phrase.density_percent}%)</span>
+                    </div>
+                `;
             });
-            html += '</ul>';
+            html += '</div>';
+        }
+        
+        if (keywords.recommendations && keywords.recommendations.length > 0) {
+            html += '<div class="keyword-recommendations"><h4>💡 Recommendations</h4><ul>';
+            keywords.recommendations.forEach(rec => {
+                html += `<li>${rec}</li>`;
+            });
+            html += '</ul></div>';
+        }
+        
+        if (keywords.keyword_stuffing_risk) {
+            html += '<div class="keyword-warning">⚠️ Keyword stuffing risk detected! Reduce overused keywords.</div>';
         }
         
         $('#keyword-content').html(html);
     }
 
     /**
-     * Display Page Speed Analysis
+     * PAGE SPEED ANALYSIS - Complete Breakdown
      */
     function displayPageSpeed(data) {
         const speed = data.page_speed_analysis || {};
         
-        if (!speed.performance_score) {
-            $('#speed-content').html('<p>No page speed data available</p>');
+        console.log('Page Speed Data:', speed);
+        
+        if (!speed.performance_score && speed.performance_score !== 0) {
+            $('#speed-content').html('<p class="no-data">❌ No page speed data available from API</p>');
             return;
         }
         
@@ -514,31 +519,85 @@ function initSEOAnalyzer($) {
                           (speed.performance_score >= 60 ? 'warning' : 'error');
         
         let html = `
-            <div class="speed-score status-${scoreClass}">
-                <div class="speed-value">${speed.performance_score}/100</div>
-                <div class="speed-grade">${speed.performance_grade || 'N/A'}</div>
+            <div class="speed-dashboard">
+                <div class="speed-score status-${scoreClass}">
+                    <div class="speed-value">${speed.performance_score}/100</div>
+                    <div class="speed-grade">${speed.performance_grade || 'N/A'}</div>
+                </div>
+                <div class="speed-metrics-grid">
+                    <div class="metric">
+                        <div class="metric-icon">⚡</div>
+                        <div class="metric-value">${speed.total_load_time_seconds?.toFixed(2) || 0}s</div>
+                        <div class="metric-label">Total Load Time</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-icon">⏱️</div>
+                        <div class="metric-value">${speed.time_to_first_byte_seconds?.toFixed(2) || 0}s</div>
+                        <div class="metric-label">TTFB</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-icon">📦</div>
+                        <div class="metric-value">${speed.page_size_mb?.toFixed(2) || 0} MB</div>
+                        <div class="metric-label">Page Size</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-icon">📄</div>
+                        <div class="metric-value">${speed.total_resources || 0}</div>
+                        <div class="metric-label">Total Resources</div>
+                    </div>
+                </div>
             </div>
-            <div class="speed-metrics">
-                <div class="metric"><strong>Load Time:</strong> ${speed.total_load_time_seconds?.toFixed(2) || 0}s</div>
-                <div class="metric"><strong>Page Size:</strong> ${speed.page_size_mb?.toFixed(2) || 0} MB</div>
-                <div class="metric"><strong>Resources:</strong> ${speed.total_resources || 0}</div>
-                <div class="metric"><strong>Compression:</strong> ${speed.compression_enabled ? '✅' : '❌'}</div>
+            
+            <div class="resource-breakdown">
+                <h4>Resource Breakdown</h4>
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span>JavaScript Files:</span>
+                        <strong>${speed.external_scripts_count || 0}</strong>
+                    </div>
+                    <div class="resource-item">
+                        <span>CSS Files:</span>
+                        <strong>${speed.external_css_count || 0}</strong>
+                    </div>
+                    <div class="resource-item">
+                        <span>Images:</span>
+                        <strong>${speed.images_count || 0}</strong>
+                    </div>
+                    <div class="resource-item">
+                        <span>Render-Blocking:</span>
+                        <strong>${speed.render_blocking_scripts || 0}</strong>
+                    </div>
+                    <div class="resource-item">
+                        <span>Compression:</span>
+                        <strong>${speed.compression_enabled ? '✅ ' + (speed.compression_type || 'Enabled') : '❌ Disabled'}</strong>
+                    </div>
+                    <div class="resource-item">
+                        <span>Caching:</span>
+                        <strong>${speed.caching_enabled ? '✅ Enabled' : '❌ Disabled'}</strong>
+                    </div>
+                </div>
             </div>
         `;
         
         if (speed.issues && speed.issues.length > 0) {
-            html += '<h4>Performance Issues</h4><ul class="issues-list">';
+            html += '<div class="speed-issues"><h4>⚠️ Performance Issues</h4><ul>';
             speed.issues.forEach(issue => {
                 html += `<li>${issue}</li>`;
             });
-            html += '</ul>';
+            html += '</ul></div>';
+        }
+        
+        if (speed.recommendations && speed.recommendations.length > 0) {
+            html += '<div class="speed-recommendations"><h4>💡 Optimization Recommendations</h4><ul>';
+            speed.recommendations.forEach(rec => {
+                html += `<li>${rec}</li>`;
+            });
+            html += '</ul></div>';
         }
         
         $('#speed-content').html(html);
     }
-    /**
-     * Display Linking Analysis
-     */
+
     function displayLinkingAnalysis(data) {
         const linking = data.linking_analysis || {};
         
@@ -561,32 +620,93 @@ function initSEOAnalyzer($) {
                     <div class="stat-label">Internal Ratio</div>
                 </div>
             </div>
+            ${linking.nofollow_internal_count > 0 ? `<div class="link-warning">⚠️ ${linking.nofollow_internal_count} internal links have nofollow attribute</div>` : ''}
+            ${linking.empty_anchor_count > 0 ? `<div class="link-error">❌ ${linking.empty_anchor_count} links have empty anchor text</div>` : ''}
         `;
         $('#linking-content').html(html);
     }
 
     /**
-     * Display Keyword Strategy
+     * BACKLINK ANALYSIS
      */
+    function displayBacklinkAnalysis(data) {
+        const backlinks = data.backlink_analysis || {};
+        
+        console.log('Backlink Data:', backlinks);
+        
+        if (!backlinks.total_external_links && backlinks.total_external_links !== 0) {
+            return; // Optional section
+        }
+        
+        const qualityClass = backlinks.link_quality_score >= 70 ? 'good' : 
+                            (backlinks.link_quality_score >= 50 ? 'warning' : 'error');
+        
+        let html = `
+            <div class="backlink-stats">
+                <div class="stat-box">
+                    <div class="stat-number">${backlinks.total_external_links || 0}</div>
+                    <div class="stat-label">External Links</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${backlinks.dofollow_count || 0}</div>
+                    <div class="stat-label">Dofollow</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${backlinks.unique_domains || 0}</div>
+                    <div class="stat-label">Unique Domains</div>
+                </div>
+                <div class="stat-box status-${qualityClass}">
+                    <div class="stat-number">${backlinks.link_quality_score || 0}</div>
+                    <div class="stat-label">Quality Score</div>
+                </div>
+            </div>
+        `;
+        
+        if (backlinks.top_linked_domains && backlinks.top_linked_domains.length > 0) {
+            html += '<h4>Top Linked Domains</h4><table class="domains-table"><thead><tr><th>Domain</th><th>Links</th><th>Authority</th></tr></thead><tbody>';
+            backlinks.top_linked_domains.slice(0, 5).forEach(domain => {
+                html += `
+                    <tr>
+                        <td>${domain.domain}</td>
+                        <td>${domain.link_count}</td>
+                        <td>${domain.estimated_authority || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+            html += '</tbody></table>';
+        }
+        
+        // Add to existing linking section or create new
+        $('#linking-content').append('<hr>' + html);
+    }
+
     function displayKeywordStrategy(data) {
         const strategy = data.keyword_strategy || {};
         
         if (!strategy.primary_keyword) {
-            $('#strategy-content').html('<p>No keyword strategy available</p>');
+            $('#strategy-content').html('<p class="no-data">No keyword strategy available</p>');
             return;
         }
         
         let html = `
             <div class="strategy-section">
-                <h4>Primary Keyword</h4>
+                <h4>🎯 Primary Keyword</h4>
                 <p class="primary-keyword">${strategy.primary_keyword}</p>
             </div>
         `;
         
         if (strategy.long_tail_keywords && strategy.long_tail_keywords.length > 0) {
-            html += '<div class="strategy-section"><h4>Long-tail Keywords</h4><ul>';
+            html += '<div class="strategy-section"><h4>📝 Long-tail Keywords</h4><div class="keywords-chips">';
             strategy.long_tail_keywords.forEach(kw => {
-                html += `<li>${kw}</li>`;
+                html += `<span class="keyword-chip">${kw}</span>`;
+            });
+            html += '</div></div>';
+        }
+        
+        if (strategy.keyword_intent && Object.keys(strategy.keyword_intent).length > 0) {
+            html += '<div class="strategy-section"><h4>🎯 Keyword Intent</h4><ul>';
+            Object.entries(strategy.keyword_intent).forEach(([kw, intent]) => {
+                html += `<li><strong>${kw}:</strong> <span class="intent-badge ${intent}">${intent}</span></li>`;
             });
             html += '</ul></div>';
         }
@@ -595,13 +715,45 @@ function initSEOAnalyzer($) {
     }
 
     /**
-     * Display 30-Day Action Plan
+     * CONTENT RECOMMENDATIONS
      */
+    function displayContentRecommendations(data) {
+        const recommendations = data.content_recommendations || [];
+        
+        console.log('Content Recommendations:', recommendations);
+        
+        if (recommendations.length === 0) {
+            return; // Optional section
+        }
+        
+        let html = '';
+        recommendations.forEach((rec, index) => {
+            html += `
+                <div class="content-rec-card">
+                    <h4>💡 ${rec.page_type}: ${rec.topic}</h4>
+                    <div class="rec-keywords">
+                        <strong>Target Keywords:</strong>
+                        ${rec.target_keywords.map(kw => `<span class="keyword-chip">${kw}</span>`).join('')}
+                    </div>
+                    ${rec.structure ? '<div class="rec-structure"><strong>Suggested Structure:</strong><ul>' + 
+                        Object.entries(rec.structure).map(([level, headings]) => 
+                            `<li><strong>${level}:</strong> ${headings.join(', ')}</li>`
+                        ).join('') + '</ul></div>' : ''}
+                </div>
+            `;
+        });
+        
+        // Append to a dedicated section if exists
+        if ($('#content-recommendations-section').length) {
+            $('#content-recommendations-section').html(html);
+        }
+    }
+
     function displayActionPlan(data) {
         const plan = data.action_plan_30_days || [];
         
         if (plan.length === 0) {
-            $('#action-content').html('<p>No action plan available</p>');
+            $('#action-content').html('<p class="no-data">No action plan available</p>');
             return;
         }
         
@@ -624,19 +776,14 @@ function initSEOAnalyzer($) {
         $('#action-content').html(html);
     }
 
-    /**
-     * Setup collapsible sections
-     */
     function setupCollapsibleSections() {
         $('.collapsible').on('click', function() {
             const target = $(this).data('target');
             const content = $('#' + target);
             const icon = $(this).find('.toggle-icon');
             
-            // Toggle content
             content.slideToggle(300);
             
-            // Toggle icon and active class
             $(this).toggleClass('active');
             if ($(this).hasClass('active')) {
                 icon.text('▼');
@@ -645,5 +792,5 @@ function initSEOAnalyzer($) {
             }
         });
     }
- 
-} 
+}
+

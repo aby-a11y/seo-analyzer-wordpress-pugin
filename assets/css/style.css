@@ -1,3 +1,9 @@
+/* ===== NEW SECTION STYLES ===== */
+.section-content { text-align: left !important; }
+.section-content p, .section-content li,
+.section-content td, .section-content h4,
+.section-content h5 { text-align: left !important; }
+
 /* === FRONTEND THEME OVERRIDE === */
 body .seo-analyzer-wrap,
 .page .seo-analyzer-wrap,

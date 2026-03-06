@@ -18,6 +18,10 @@ class SEO_Analyzer {
         check_ajax_referer('seo_analyzer_nonce', 'nonce');
         
         $url = isset($_POST['url']) ? sanitize_url($_POST['url']) : '';
+        $user_name  = isset($_POST['user_name'])  ? sanitize_text_field($_POST['user_name'])  : 'Anonymous';
+$user_email = isset($_POST['user_email']) ? sanitize_email($_POST['user_email'])       : 'noemail@example.com';
+$user_phone = isset($_POST['user_phone']) ? sanitize_text_field($_POST['user_phone'])  : '0000000000';
+
         
         if (empty($url)) {
             wp_send_json_error('URL required');
@@ -30,7 +34,7 @@ class SEO_Analyzer {
             return;
         }
         
-        $report = $this->call_api($url);
+        $report = $this->call_api($url, $user_name, $user_email, $user_phone);
         
         if (isset($report['error'])) {
             wp_send_json_error($report['error']);
@@ -43,13 +47,21 @@ class SEO_Analyzer {
         wp_send_json_success($report);
     }
     
-  private function call_api($url) {
+  private function call_api($url, $user_name = 'Anonymous', $user_email = 
+  'noemail@example.com', $user_phone = '0000000000') {
     // Debug logging
     error_log('SEO Analyzer: Starting API call for URL: ' . $url);
     error_log('SEO Analyzer: API Endpoint: ' . $this->api_url);
     
     $response = wp_remote_post($this->api_url, array(
-        'body' => json_encode(array('url' => $url)),
+        'body' => json_encode(array(
+    'url' => $url,
+    'user_details' => array(
+        'name'  => $user_name,
+        'email' => $user_email,
+        'phone' => $user_phone
+    )
+)),
         'headers' => array(
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
@@ -115,4 +127,3 @@ class SEO_Analyzer {
     }
 }
 ?>
-

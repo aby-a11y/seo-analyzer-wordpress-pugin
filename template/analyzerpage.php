@@ -15,6 +15,10 @@ if (!defined('ABSPATH')) exit;
             <label for="analyze-url"><span class="label-icon">🔗</span> Enter Website URL to Analyze</label>
             <input type="hidden" id="seo-analyzer-nonce" value="<?php echo wp_create_nonce('seo_analyzer_nonce'); ?>" />
             <div class="input-wrapper">
+                <input type="text" id="user-name" placeholder="Aapka Naam" required style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:6px;">
+                <input type="email" id="user-email" placeholder="Email Address" required style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:6px;">
+                <input type="tel" id="user-phone" placeholder="Phone Number" required style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:6px;">
+
                 <input type="url" id="analyze-url" placeholder="https://example.com" required>
                 <button id="analyze-btn" class="btn-primary">
                     <span class="btn-text">Analyze SEO</span>

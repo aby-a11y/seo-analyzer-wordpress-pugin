@@ -31,7 +31,11 @@ function initSEOAnalyzer($) {
             const url = $('#analyze-url').val().trim();
             if (!url) { showError('Please enter a URL'); return; }
             if (!isValidURL(url)) { showError('Please enter a valid URL (e.g., https://example.com)'); return; }
-            analyzeURL(url);
+            const userName  = $('#user-name').val().trim();
+            const userEmail = $('#user-email').val().trim();
+            const userPhone = $('#user-phone').val().trim();
+            analyzeURL(url, userName, userEmail, userPhone);
+
         });
         $('#analyze-url').on('keypress', function (e) { if (e.which === 13) $('#analyze-btn').click(); });
     }
@@ -46,13 +50,15 @@ function initSEOAnalyzer($) {
         setTimeout(function () { $('#error-message').fadeOut(); }, 5000);
     }
 
-    function analyzeURL(url) {
+    function analyzeURL(url, userName, userEmail, userPhone) {
+
         $('#analyze-btn').prop('disabled', true);
         $('.btn-text').hide(); $('.btn-loader').show();
         $('#error-message').hide(); $('#results-container').hide();
         $.ajax({
             url: seoAnalyzer.ajaxurl, type: 'POST',
-            data: { action: 'analyze_url', url: url, nonce: seoAnalyzer.nonce },
+            data: { action: 'analyze_url', url: url, nonce: seoAnalyzer.nonce, user_name: userName, user_email: userEmail, user_phone: userPhone },
+
             timeout: 120000,
             success: function (response) {
                 if (response.success) displayResults(response.data);

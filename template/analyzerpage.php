@@ -163,6 +163,16 @@ if (!defined('ABSPATH')) exit;
                 <div id="speed-content"></div>
             </div>
         </div>
+        <!-- SECTION: RESPONSIVE PREVIEW -->
+<div class="seo-section">
+    <div class="section-header collapsible" data-target="responsive-preview">
+        <h2><span class="toggle-icon">▶</span><span class="section-icon">📱</span> Responsive Preview</h2>
+    </div>
+    <div id="responsive-preview" class="section-content" style="display:none;">
+        <div id="responsive-preview-content"></div>
+    </div>
+</div>
+
 
         <!-- SECTION 11: ACTION PLAN -->
         <div class="seo-section">

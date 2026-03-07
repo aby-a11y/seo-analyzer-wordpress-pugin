@@ -91,6 +91,7 @@ function initSEOAnalyzer($) {
         displayAdvancedAnalytics(data);
         displayPageSpeed(data);
         displayActionPlan(data);
+        displayResponsivePreview(data);
     }
 
     function displayScoreAndSummary(data) {
@@ -567,5 +568,34 @@ function initSEOAnalyzer($) {
             icon.text($(this).hasClass('active') ? '▼' : '▶');
         });
     }
+
+    // ===== RESPONSIVE PREVIEW =====
+function displayResponsivePreview(data) {
+    const preview = data.responsive_preview || {};
+    if (!preview || Object.keys(preview).length === 0) {
+        $('#responsive-preview-content').html('<p class="no-data">📸 No screenshots available</p>');
+        return;
+    }
+    const deviceIcons = { mobile: '📱', tablet: '📟', desktop: '🖥️' };
+    let html = '<div class="responsive-preview-grid">';
+    Object.entries(preview).forEach(([device, info]) => {
+        html += `
+        <div class="preview-card">
+            <div class="preview-header">
+                <span class="device-icon">${deviceIcons[device] || '📱'}</span>
+                <strong>${info.device || device}</strong>
+                <span class="device-size">${info.width}×${info.height}px</span>
+            </div>
+            <div class="preview-img-wrap">
+                <img src="data:image/png;base64,${info.image}"
+                     alt="${device} screenshot"
+                     class="preview-img"
+                     loading="lazy" />
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    $('#responsive-preview-content').html(html);
+}
 
 } // END initSEOAnalyzer

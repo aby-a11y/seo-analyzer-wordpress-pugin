@@ -233,15 +233,28 @@ function initSEOAnalyzer($) {
                 <strong>Status:</strong> ${t.canonical_status || 'Not checked'}</div>
             ${t.canonical_url ? `<div class="status-item"><strong>URL:</strong> ${t.canonical_url}</div>` : ''}
             ${(t.canonical_issues || []).map(i => `<div class="status-item status-warning">${i}</div>`).join('')}`);
+       
         $('#ssl-status').html(`
             <div class="status-item ${t.ssl_enabled ? 'status-good' : 'status-error'}">
                 <strong>HTTPS:</strong> ${t.ssl_enabled ? '✅ Enabled' : '❌ Disabled (Critical!)'}</div>`);
+      
         $('#robots-status').html(`
             <div class="status-item ${t.robots_txt_found ? 'status-good' : 'status-error'}">
                 <strong>Robots.txt:</strong> ${t.robots_txt_found ? '✅ Found' : '❌ Missing'}</div>
             <div class="status-item ${t.sitemap_found ? 'status-good' : 'status-error'}">
                 <strong>Sitemap:</strong> ${t.sitemap_found ? '✅ Found' : '❌ Missing'}</div>
             ${t.robots_directive ? `<div class="status-item"><strong>Meta Robots:</strong> ${t.robots_directive}</div>` : ''}`);
+      
+        $('#llm-status').html(`
+    <div class="status-item ${t.llm_txt_found ? 'status-good' : 'status-warning'}">
+        <strong>LLM.txt:</strong> ${t.llm_txt_found ? '✅ Found' : '⚠️ Not Found'}
+    </div>
+    <div class="status-item">
+        ${t.llm_txt_found
+            ? '✅ AI-friendly content guide present'
+            : '💡 Add /llm.txt to help AI crawlers understand your site'}
+    </div>`);
+
         $('#schema-status').html(`
             <div class="status-item ${schema.has_schema ? 'status-good' : 'status-warning'}">
                 <strong>Schema:</strong> ${schema.has_schema ? '✅ Present' : '⚠️ Missing'}</div>

@@ -88,6 +88,7 @@ if (!defined('ABSPATH')) exit;
                     <div class="tech-item"><h4>🔗 Canonical Tag</h4><div id="canonical-status"></div></div>
                     <div class="tech-item"><h4>🔒 SSL Certificate</h4><div id="ssl-status"></div></div>
                     <div class="tech-item"><h4>🤖 Robots & Sitemap</h4><div id="robots-status"></div></div>
+                    <div class="tech-item"><h4>🧠 LLM.txt</h4><div id="llm-status"></div></div> 
                     <div class="tech-item"><h4>📋 Schema Markup</h4><div id="schema-status"></div></div>
                 </div>
             </div>

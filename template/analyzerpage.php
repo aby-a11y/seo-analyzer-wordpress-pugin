@@ -55,7 +55,7 @@ if (!defined('ABSPATH')) exit;
         <!-- QUICK STATS -->
         <div class="stats-grid">
             <div class="stat-card"><div class="stat-icon">📝</div><div class="stat-content"><div class="stat-value" id="word-count">0</div><div class="stat-label">Words</div></div></div>
-            <div class="stat-card"><div class="stat-icon">🖼️</div><div class="stat-content"><div class="stat-value" id="image-count">0</div><div class="stat-label">Images</div></div></div>
+            <div class="stat-card"><div class="stat-icon">🖼️</div><div class="stat-content"><div class="stat-value" id="Alt-text-image-count">0</div><div class="stat-label">Images</div></div></div>
             <div class="stat-card"><div class="stat-icon">🔗</div><div class="stat-content"><div class="stat-value" id="link-count">0</div><div class="stat-label">Links</div></div></div>
             <div class="stat-card"><div class="stat-icon">⚡</div><div class="stat-content"><div class="stat-value" id="load-time">0s</div><div class="stat-label">Load Time</div></div></div>
         </div>
